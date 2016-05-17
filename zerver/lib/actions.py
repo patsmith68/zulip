@@ -2983,7 +2983,7 @@ def get_occupied_streams(realm):
     return Stream.objects.filter(id__in=stream_ids, realm=realm, deactivated=False)
 
 def do_get_streams(user_profile, include_public=True, include_subscribed=True,
-                   include_all_active=False):
+                   include_all_active=False, include_default=False):
     if include_all_active and not user_profile.is_api_super_user:
         raise JsonableError("User not authorized for this query")
 
@@ -3022,6 +3022,14 @@ def do_get_streams(user_profile, include_public=True, include_subscribed=True,
 
     streams = [make_dict(row) for row in query]
     streams.sort(key=lambda elt: elt["name"])
+    
+    if include_default:
+         is_default = {}
+         default_streams = get_default_streams_for_realm(user_profile.realm)
+         for stream in default_streams:
+             is_default[stream.id] = True
+         for stream in streams:
+             stream['is_default'] = is_default.get(stream["stream_id"], False)
 
     return streams
 

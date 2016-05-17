@@ -19,6 +19,9 @@
         <li role="presentation">
           <a href="#streams" aria-controls="streams" role="tab" data-toggle="tab"><i class="icon-vector-exchange settings-section-icon"></i> Streams Deletion</a>
         </li>
+        <li role="presentation">
+          <a href="#default_streams" aria-controls="default_streams" role="tab" data-toggle="tab"><i class="icon-vector-exchange settings-section-icon"></i> Default Streams</a>
+        </li>
       </ul>
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="organization">
@@ -155,6 +158,21 @@
           <div id="admin_page_streams_loading_indicator"></div>
           </div>
         </div>
+        
+         <div role="tabpanel" class="tab-pane" id="default_streams">
+           <div id="admin-default-streams-list" class="settings-section">
+             <div class="settings-section-title"><i class="icon-vector-exchange settings-section-icon"></i>
+             Default Streams</div>
+             <p class="admin-streams-note">Default Streams new users are subscribed to.</p>
+             <table class="table table-condensed table-striped">
+               <tbody id="admin_default_streams_table" class="admin_default_stream_table">
+                 <th>Name</th>
+                 <th>Actions</th>
+               </tbody>
+             </table>
+             <div id="admin_page_default_streams_loading_indicator"></div>
+           </div>
+         </div>
       </div>
 
       <div id="deactivation_user_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deactivation_user_modal_label" aria-hidden="true">

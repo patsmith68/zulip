@@ -126,6 +126,7 @@ def add_default_stream(request, user_profile, stream_name=REQ):
 @require_realm_admin
 @has_request_variables
 def remove_default_stream(request, user_profile, stream_name=REQ):
+    print stream_name
     return json_success(do_remove_default_stream(user_profile.realm, stream_name))
 
 @authenticated_json_post_view
@@ -149,9 +150,15 @@ def json_make_stream_private(request, user_profile, stream_name=REQ):
 @require_realm_admin
 @has_request_variables
 def update_stream_backend(request, user_profile, stream_name,
-                          description=REQ(validator=check_string, default=None)):
+                          description=REQ(validator=check_string, default=None),
+                          is_default=REQ(validator=check_bool, default=None)):
     if description is not None:
        do_change_stream_description(user_profile.realm, stream_name, description)
+       if is_default is not None:
+         if is_default:
+             do_add_default_stream(user_profile.realm, stream_name)
+         else:
+             do_remove_default_stream(user_profile.realm, stream_name)
     return json_success({})
 
 def list_subscriptions_backend(request, user_profile):
@@ -388,10 +395,13 @@ def json_get_subscribers(request, user_profile):
 def get_streams_backend(request, user_profile,
                         include_public=REQ(validator=check_bool, default=True),
                         include_subscribed=REQ(validator=check_bool, default=True),
-                        include_all_active=REQ(validator=check_bool, default=False)):
+                        include_all_active=REQ(validator=check_bool, default=False),
+                        include_default=REQ(validator=check_bool, default=False)):
 
-    streams = do_get_streams(user_profile, include_public, include_subscribed,
-                             include_all_active)
+    streams = do_get_streams(user_profile, include_public=include_public,
+                              include_subscribed=include_subscribed,
+                              include_all_active=include_all_active,
+                              include_default=include_default)
     return json_success({"streams": streams})
 
 @authenticated_json_post_view
