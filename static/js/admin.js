@@ -65,20 +65,88 @@ function populate_users (realm_people_data) {
     loading.destroy_indicator($('#admin_page_deactivated_users_loading_indicator'));
 }
 
+function substringMatcher(strs) {
+    return function findMatches(q, cb) {
+      var matches, substringRegex;
+
+      // an array that will be populated with substring matches
+      matches = [];
+
+      // regex used to determine if a string contains the substring `q`
+      substrRegex = new RegExp(q, 'i');
+
+      // iterate through the pool of strings and for any string that
+      // contains the substring `q`, add it to the `matches` array
+      $.each(strs, function(i, str) {
+        if (substrRegex.test(str)) {
+          matches.push(str);
+        }
+      });
+
+      cb(matches);
+    };
+  };
+  
 function populate_streams (streams_data) {
     var streams_table = $("#admin_streams_table").expectOne();
+    exports.all_streams = streams_data;
     streams_table.find("tr.stream_row").remove();
     _.each(streams_data.streams, function (stream) {
         streams_table.append(templates.render("admin_streams_list", {stream: stream}));
     });
     loading.destroy_indicator($('#admin_page_streams_loading_indicator'));
+}
+
+function populate_defualt_streams(streams_data) {
     var default_streams_table = $("#admin_default_streams_table").expectOne();
     default_streams_table.find("tr.stream_row").remove();
     _.each(streams_data.streams, function (stream) {
-        default_streams_table.append(templates.render("admin_default_streams_list", {stream: stream}));
+        if(stream.is_default) {
+            default_streams_table.append(templates.render("admin_default_streams_list", {stream: stream}));
+        }
     });
     loading.destroy_indicator($('#admin_page_default_streams_loading_indicator'));
 }
+
+  
+function get_non_default_stream_names(streams_data) {
+    var non_default_stream_names = [];
+     _.each(streams_data.streams, function (stream) {
+        if(!stream.is_default) {
+            non_default_stream_names.push(stream.name);
+        }          
+     });
+     
+     return non_default_stream_names;
+}  
+
+function update_stream_suggestion_list() {
+    console.log("request being made");
+    channel.get({
+        url:      '/json/streams?include_public=true&include_subscribed=true&include_default=true',
+        timeout:  10*1000,
+        idempotent: true,
+        success: function(streams_data) {
+             var non_default_stream_names = get_non_default_stream_names(streams_data);
+             console.log(non_default_stream_names);
+             $("#admin_default_streams_table tr").find("tr:gt(0)").remove();
+             populate_defualt_streams(streams_data);
+             $('.create_default_stream').typeahead('destroy');
+             $('.create_default_stream').typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                name: 'streams',
+                source: substringMatcher(non_default_stream_names)
+            });
+        },
+        error: failed_listing_streams
+    });
+}
+
+
 
 exports.populate_emoji = function (emoji_data) {
     var emoji_table = $('#admin_emoji_table').expectOne();
@@ -125,7 +193,7 @@ exports.setup_page = function () {
         error: failed_listing_users
     });
 
-    // Populate streams table
+    // Populate streams table and stream suggestions list
     channel.get({
         url:      '/json/streams?include_public=true&include_subscribed=true&include_default=true',
         timeout:  10*1000,
@@ -136,6 +204,7 @@ exports.setup_page = function () {
 
     // Populate emoji table
     exports.populate_emoji(page_params.realm_emoji);
+    update_stream_suggestion_list();
 
     // Setup click handlers
     $(".admin_user_table").on("click", ".deactivate", function (e) {
@@ -196,46 +265,39 @@ exports.setup_page = function () {
             },
              
             success: function () {
-                $(".active_stream_row button").attr("class", "btn add-default-stream btn-success");
-                $(".active_stream_row button").text("Make default stream");
+                var row = $(".active_stream_row");
+                row.remove();
             }
         });
     });
     
-    //Make stream default
-    $(".admin_default_stream_table").on("click", ".add-default-stream", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
- 
-        $(".active_stream_row").removeClass("active_stream_row");
-        var row = $(e.target).closest(".stream_row");
-        row.addClass("active_stream_row");
- 
-        var stream_name = row.find('.stream_name').text();
+    $('.create_default_stream').bind('typeahead:select', function(ev, stream_name) {
         var data = {
             stream_name: stream_name
         };
-         
+        var default_streams_table = $("#admin_default_streams_table").expectOne();
+
         channel.put({
             url: '/json/default_streams',
             data: data,
             error: function (xhr, error_type) {
                 if (xhr.status.toString().charAt(0) === "4") {
+                    console.log("error");
                     $(".active_stream_row button").closest("td").html(
                         $("<p>").addClass("text-error").text($.parseJSON(xhr.responseText).msg)
                     );
                 } else {
                     $(".active_stream_row button").text("Failed!");
+                    console.log("error");
                 }
             },
                 
             success: function () {
-                $(".active_stream_row button").attr("class", "btn remove-default-stream btn-danger");
-                $(".active_stream_row button").text("Remove from default");
+                $('.create_default_stream').typeahead('val', "");
+                update_stream_suggestion_list();
             }
         });
     });
- 
 
     $(".admin_bot_table").on("click", ".deactivate", function (e) {
         e.preventDefault();
