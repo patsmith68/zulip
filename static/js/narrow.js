@@ -183,7 +183,7 @@ exports.activate = function (raw_operators, opts) {
     }
 
     opts = _.defaults({}, opts, {
-        then_select_id: home_msg_list.selected_id(),
+        then_select_id: message_list.home.selected_id(),
         select_first_unread: false,
         first_unread_from_server: false,
         from_reload: false,
@@ -241,7 +241,7 @@ exports.activate = function (raw_operators, opts) {
         then_select_offset = page_params.initial_narrow_offset;
         opts.first_unread_from_server = false;
         opts.select_first_unread = false;
-        home_msg_list.pre_narrow_offset = page_params.initial_offset;
+        message_list.home.pre_narrow_offset = page_params.initial_offset;
     }
 
     var msg_list = new message_list.MessageList('zfilt', current_filter, {
@@ -443,7 +443,7 @@ exports.deactivate = function () {
     $("body").removeClass('narrowed_view');
     $("#zfilt").removeClass('focused_table');
     $("#zhome").addClass('focused_table');
-    current_msg_list = home_msg_list;
+    current_msg_list = message_list.home;
     condense.condense_and_collapse($("#zhome tr.message_row"));
 
     $('#search_query').val('');

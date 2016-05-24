@@ -55,7 +55,7 @@ exports.uncollapse = function (row) {
     };
 
     // We also need to collapse this message in the home view
-    var home_row = home_msg_list.get_row(rows.id(row));
+    var home_row = message_list.home.get_row(rows.id(row));
 
     process_row(row);
     process_row(home_row);
@@ -74,7 +74,7 @@ exports.collapse = function (row) {
     };
 
     // We also need to collapse this message in the home view
-    var home_row = home_msg_list.get_row(rows.id(row));
+    var home_row = message_list.home.get_row(rows.id(row));
 
     process_row(row);
     process_row(home_row);

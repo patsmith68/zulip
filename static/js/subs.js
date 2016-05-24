@@ -98,24 +98,24 @@ function update_in_home_view(sub, value) {
         // Save our current scroll position
         if (ui.home_tab_obscured()) {
             saved_ypos = viewport.scrollTop();
-        } else if (home_msg_list === current_msg_list &&
+        } else if (message_list.home === current_msg_list &&
                    current_msg_list.selected_row().offset() !== null) {
             msg_offset = current_msg_list.selected_row().offset().top;
         }
 
-        home_msg_list.clear({clear_selected_id: false});
+        message_list.home.clear({clear_selected_id: false});
 
-        // Recreate the home_msg_list with the newly filtered message_list.all
-        message_store.add_messages(message_list.all.all_messages(), home_msg_list);
+        // Recreate the message_list.home with the newly filtered message_list.all
+        message_store.add_messages(message_list.all.all_messages(), message_list.home);
 
         // Ensure we're still at the same scroll position
         if (ui.home_tab_obscured()) {
             viewport.scrollTop(saved_ypos);
-        } else if (home_msg_list === current_msg_list) {
+        } else if (message_list.home === current_msg_list) {
             // We pass use_closest to handle the case where the
             // currently selected message is being hidden from the
             // home view
-            home_msg_list.select_id(home_msg_list.selected_id(),
+            message_list.home.select_id(message_list.home.selected_id(),
                                     {use_closest: true, empty_ok: true});
             if (current_msg_list.selected_id() !== -1) {
                 viewport.set_message_offset(msg_offset);
@@ -128,8 +128,8 @@ function update_in_home_view(sub, value) {
         pointer.recenter_pointer_on_display = true;
         pointer.suppress_scroll_pointer_update = true;
 
-        if (! home_msg_list.empty()) {
-            process_loaded_for_unread(home_msg_list.all_messages());
+        if (! message_list.home.empty()) {
+            process_loaded_for_unread(message_list.home.all_messages());
         }
     }, 0);
 
@@ -168,7 +168,7 @@ function update_stream_name(sub, new_name) {
     stream_list.rename_stream(sub);
 
     // Update the message feed.
-    _.each([home_msg_list, current_msg_list, message_list.all], function (list) {
+    _.each([message_list.home, current_msg_list, message_list.all], function (list) {
         list.change_display_recipient(old_name, new_name);
     });
 }

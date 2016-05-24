@@ -236,11 +236,11 @@ function get_events_success(events) {
     {
         pointer.furthest_read = new_pointer;
         pointer.server_furthest_read = new_pointer;
-        home_msg_list.select_id(new_pointer, {then_scroll: true, use_closest: true});
+        message_list.home.select_id(new_pointer, {then_scroll: true, use_closest: true});
     }
 
-    if ((home_msg_list.selected_id() === -1) && !home_msg_list.empty()) {
-        home_msg_list.select_id(home_msg_list.first().id, {then_scroll: false});
+    if ((message_list.home.selected_id() === -1) && !message_list.home.empty()) {
+        message_list.home.select_id(message_list.home.first().id, {then_scroll: false});
     }
 
     if (messages_to_update.length !== 0) {

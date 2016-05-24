@@ -162,11 +162,11 @@ MessageListView.prototype = {
                 message_container.subscribed = false;
                 message_container.unsubscribed = false;
 
-                // This home_msg_list condition can be removed
+                // This message_list.home condition can be removed
                 // once we filter historical messages from the
                 // home view on the server side (which requires
                 // having an index on UserMessage.flags)
-                if (self.list !== home_msg_list) {
+                if (self.list !== message_list.home) {
                     self.add_subscription_marker(current_group, prev, message_container);
                 }
 
@@ -237,7 +237,7 @@ MessageListView.prototype = {
             first_group.message_containers = first_group.message_containers.concat(second_group.message_containers);
             return true;
         // Add a subscription marker
-        } else if (this.list !== home_msg_list && last_msg_container.msg.historical !== first_msg_container.msg.historical) {
+        } else if (this.list !== message_list.home && last_msg_container.msg.historical !== first_msg_container.msg.historical) {
             first_group.bookend_bottom = true;
             this.add_subscription_marker(first_group, last_msg_container, first_msg_container);
         }

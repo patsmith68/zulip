@@ -4,6 +4,7 @@
 
 add_dependencies({
     util: 'js/util.js',
+    rows: 'js/rows.js',
     muting: 'js/muting.js',
     MessageListView: 'js/message_list_view.js'
 });

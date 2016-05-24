@@ -4,6 +4,7 @@ var message_list = (function () {
 var exports = {};
 
 exports.narrowed = undefined;
+exports.all = undefined;
 
 exports.MessageList = function (table_name, filter, opts) {
     _.extend(this, {
@@ -625,6 +626,10 @@ exports.MessageList.prototype = {
 exports.all = new exports.MessageList(
     undefined, undefined,
     {muting_enabled: false}
+);
+
+exports.home = new exports.MessageList('zhome',
+    new Filter([{operator: "in", operand: "home"}]), {muting_enabled: true}
 );
 
 // We stop autoscrolling when the user is clearly in the middle of

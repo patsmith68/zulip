@@ -184,7 +184,7 @@ exports.add_messages = function add_messages(messages, msg_list, opts) {
 
     msg_list.add_messages(messages, opts);
 
-    if (msg_list === home_msg_list && opts.messages_are_new) {
+    if (msg_list === message_list.home && opts.messages_are_new) {
         _.each(messages, function (message) {
             if (message.local_id === undefined) {
                 compose.report_as_received(message);
@@ -341,13 +341,13 @@ exports.update_messages = function update_messages(events) {
     // to be updated
     if (topic_edited) {
         if (!changed_narrow) {
-            home_msg_list.rerender();
+            message_list.home.rerender();
             if (current_msg_list === message_list.narrowed) {
                 message_list.narrowed.rerender();
             }
         }
     } else {
-        home_msg_list.view.rerender_messages(msgs_to_rerender);
+        message_list.home.view.rerender_messages(msgs_to_rerender);
         if (current_msg_list === message_list.narrowed) {
             message_list.narrowed.view.rerender_messages(msgs_to_rerender);
         }
@@ -360,9 +360,9 @@ exports.update_messages = function update_messages(events) {
 exports.insert_new_messages = function insert_new_messages(messages) {
     messages = _.map(messages, add_message_metadata);
 
-    // You must add add messages to home_msg_list BEFORE
+    // You must add add messages to message_list.home BEFORE
     // calling unread.process_loaded_messages.
-    exports.add_messages(messages, home_msg_list, {messages_are_new: true});
+    exports.add_messages(messages, message_list.home, {messages_are_new: true});
     exports.add_messages(messages, message_list.all, {messages_are_new: true});
 
     if (narrow.active()) {
@@ -421,9 +421,9 @@ function process_result(messages, opts) {
     messages = _.map(messages, add_message_metadata);
 
     // If we're loading more messages into the home view, save them to
-    // the message_list.all as well, as the home_msg_list is reconstructed
+    // the message_list.all as well, as the message_list.home is reconstructed
     // from message_list.all.
-    if (opts.msg_list === home_msg_list) {
+    if (opts.msg_list === message_list.home) {
         process_loaded_for_unread(messages);
         exports.add_messages(messages, message_list.all, {messages_are_new: false});
     }
@@ -482,7 +482,7 @@ exports.load_old_messages = function load_old_messages(opts) {
         }
         data.narrow = JSON.stringify(operators);
     }
-    if (opts.msg_list === home_msg_list && page_params.narrow_stream !== undefined) {
+    if (opts.msg_list === message_list.home && page_params.narrow_stream !== undefined) {
         data.narrow = JSON.stringify(page_params.narrow);
     }
     if (opts.use_first_unread_anchor) {
@@ -567,8 +567,8 @@ util.execute_early(function () {
         //
         // We fall back to the closest selected id, as the user may have removed
         // a stream from the home before already
-        if (home_msg_list.selected_id() === -1 && !home_msg_list.empty()) {
-            home_msg_list.select_id(page_params.initial_pointer,
+        if (message_list.home.selected_id() === -1 && !message_list.home.empty()) {
+            message_list.home.select_id(page_params.initial_pointer,
                                     {then_scroll: true, use_closest: true,
                                      target_scroll_offset: page_params.initial_offset});
         }
@@ -581,7 +581,7 @@ util.execute_early(function () {
                     anchor: latest_id.toFixed(),
                     num_before: 0,
                     num_after: 400,
-                    msg_list: home_msg_list,
+                    msg_list: message_list.home,
                     cont: load_more
                 });
                 return;
@@ -599,7 +599,7 @@ util.execute_early(function () {
                                   anchor: first_id,
                                   num_before: backfill_batch_size,
                                   num_after: 0,
-                                  msg_list: home_msg_list
+                                  msg_list: message_list.home
                               });
                           }});
     }
@@ -609,7 +609,7 @@ util.execute_early(function () {
             anchor: page_params.initial_pointer,
             num_before: 200,
             num_after: 200,
-            msg_list: home_msg_list,
+            msg_list: message_list.home,
             cont: load_more
         });
     } else {
@@ -632,7 +632,7 @@ util.execute_early(function () {
         // created, but due to the closure, the old list is not garbage collected. This also leads
         // to the old list receiving the change id events, and throwing errors as it does not
         // have the messages that you would expect in its internal data structures.
-        _.each([message_list.all, home_msg_list, message_list.narrowed], function (msg_list) {
+        _.each([message_list.all, message_list.home, message_list.narrowed], function (msg_list) {
             if (msg_list !== undefined) {
                 msg_list.change_message_id(old_id, new_id);
 

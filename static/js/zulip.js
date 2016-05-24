@@ -1,7 +1,5 @@
-var home_msg_list = new message_list.MessageList('zhome',
-    new Filter([{operator: "in", operand: "home"}]), {muting_enabled: true}
-);
-var current_msg_list = home_msg_list;
+
+var current_msg_list = message_list.home;
 
 var recent_subjects = new Dict({fold_case: true});
 
@@ -198,9 +196,9 @@ function main() {
         }
         // Additionally, don't advance the pointer server-side
         // if the selected message is local-only
-        if (event.msg_list === home_msg_list && page_params.narrow_stream === undefined) {
+        if (event.msg_list === message_list.home && page_params.narrow_stream === undefined) {
             if (event.id > pointer.furthest_read &&
-                home_msg_list.get(event.id).local_id === undefined) {
+                message_list.home.get(event.id).local_id === undefined) {
                 pointer.furthest_read = event.id;
             }
         }

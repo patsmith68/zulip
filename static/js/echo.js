@@ -194,7 +194,7 @@ exports.edit_locally = function edit_locally(message, raw_content, new_topic) {
     message.content = exports.apply_markdown(raw_content);
     // We don't handle unread counts since local messages must be sent by us
 
-    home_msg_list.view.rerender_messages([message]);
+    message_list.home.view.rerender_messages([message]);
     if (current_msg_list === message_list.narrowed) {
         message_list.narrowed.view.rerender_messages([message]);
     }
@@ -261,7 +261,7 @@ exports.process_from_server = function process_from_server(messages) {
     });
 
     if (updated) {
-        home_msg_list.view.rerender_messages(msgs_to_rerender);
+        message_list.home.view.rerender_messages(msgs_to_rerender);
         if (current_msg_list === message_list.narrowed) {
             message_list.narrowed.view.rerender_messages(msgs_to_rerender);
         }
@@ -281,7 +281,7 @@ exports.message_send_error = function message_send_error(local_id, error_respons
 
 function abort_message(message) {
     // Remove in all lists in which it exists
-    _.each([message_list.all, home_msg_list, current_msg_list], function (msg_list) {
+    _.each([message_list.all, message_list.home, current_msg_list], function (msg_list) {
         msg_list.remove_and_rerender([message]);
     });
 }

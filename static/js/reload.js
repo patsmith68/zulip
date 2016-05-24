@@ -36,20 +36,20 @@ function preserve_state(send_after_reload, save_pointer, save_narrow, save_compo
     }
 
     if (save_pointer) {
-        var pointer = home_msg_list.selected_id();
+        var pointer = message_list.home.selected_id();
         if (pointer !== -1) {
             url += "+pointer=" + pointer;
         }
     }
 
     if (save_narrow) {
-        var row = home_msg_list.selected_row();
+        var row = message_list.home.selected_row();
         if (!narrow.active()) {
             if (row.length > 0) {
                 url += "+offset=" + row.offset().top;
             }
         } else {
-            url += "+offset=" + home_msg_list.pre_narrow_offset;
+            url += "+offset=" + message_list.home.pre_narrow_offset;
 
             var narrow_pointer = message_list.narrowed.selected_id();
             if (narrow_pointer !== -1) {
@@ -156,7 +156,7 @@ function cleanup_before_reload() {
 
         // Empty the large collections
         clear_message_list(message_list.all);
-        clear_message_list(home_msg_list);
+        clear_message_list(message_list.home);
         clear_message_list(message_list.narrowed);
         message_store.clear();
 
