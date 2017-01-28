@@ -8,6 +8,7 @@ from django.core.files import File
 from django.http import HttpRequest
 from jinja2 import Markup as mark_safe
 import unicodedata
+import boto3
 
 from zerver.lib.avatar_hash import user_avatar_hash
 from zerver.lib.request import JsonableError
@@ -179,8 +180,10 @@ def get_signed_upload_url(path):
 
 def get_realm_for_filename(path):
     # type: (Text) -> Optional[int]
-    conn = S3Connection(settings.S3_KEY, settings.S3_SECRET_KEY)
-    key = get_bucket(conn, settings.S3_AUTH_UPLOADS_BUCKET).get_key(path)
+    # conn = S3Connection(settings.S3_KEY, settings.S3_SECRET_KEY)
+    s3 = boto3.resource('s3')
+    key = s3.Bucket(settings.S3_AUTH_UPLOADS_BUCKET).get_key(path)
+    # key = get_bucket(conn, settings.S3_AUTH_UPLOADS_BUCKET).get_key(path)
     if key is None:
         # This happens if the key does not exist.
         return None
