@@ -4,7 +4,13 @@ $(function () {
 
     $.validator.addMethod('password_strength', function (value) {
         return common.password_quality(value, undefined, $('#id_password, #id_new_password1'));
-    }, "Password is too weak.");
+    }, function () {
+        var password_input = $('#id_password, #id_new_password1');
+        if (password_input.is(':focus')) {
+            return "";
+        }
+        return common.password_warning(password_input.val(), password_input);
+    });
 
     function highlight(class_to_add) {
         // Set a class on the enclosing control group.

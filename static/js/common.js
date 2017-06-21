@@ -24,16 +24,16 @@ exports.password_quality = function (password, bar, password_field) {
         return undefined;
     }
 
-    var min_length = 6;
+    var min_password_length = 6;
     var min_quality = 0;
 
     if (password_field) {
-        min_length = password_field.data('minLength') || min_length;
+        min_password_length = password_field.data('minLength') || min_password_length;
         min_quality = password_field.data('minQuality') || min_quality;
     }
 
     // Consider the password acceptable if it's at least 6 characters.
-    var acceptable = password.length >= min_length;
+    var acceptable = password.length >= min_password_length;
 
     // Compute a quality score in [0,1].
     var result  = zxcvbn(password);
@@ -60,6 +60,22 @@ exports.password_quality = function (password, bar, password_field) {
     }
 
     return acceptable;
+};
+
+exports.password_warning = function (password, password_field) {
+    if (typeof zxcvbn === 'undefined') {
+        return undefined;
+    }
+
+    var min_password_length = 6;
+    if (password_field) {
+        min_password_length = password_field.data('minLength') || min_password_length;
+    }
+
+    if (password.length < min_password_length) {
+        return i18n.t('Password should be at least __length__ characters long', {length: min_password_length});
+    }
+    return i18n.t(zxcvbn(password).feedback.warning) || i18n.t("Password is too weak");
 };
 
 return exports;
