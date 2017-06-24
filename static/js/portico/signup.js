@@ -37,6 +37,13 @@ $(function () {
                 error.insertAfter(element).addClass('help-inline text-error');
             }
         },
+        invalidHandler: function () {
+            setTimeout(function () {
+                $('.error.help-inline.text-error').slideUp(function () {
+                    $('.error.help-inline.text-error').slideDown();
+                });
+            }, 300);
+        },
         highlight:   highlight('error'),
         unhighlight: highlight('success'),
     });
