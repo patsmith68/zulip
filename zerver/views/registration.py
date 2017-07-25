@@ -72,7 +72,7 @@ This is a great place to test formatting, sending, and editing messages.
 Click anywhere on this message to reply. A compose box will open at the bottom of the screen."""
 
     internal_send_private_message(user.realm, get_system_bot(settings.WELCOME_BOT),
-                                  user.email, content)
+                                  user, content)
 
 @require_post
 def accounts_register(request):
