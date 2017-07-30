@@ -11,7 +11,7 @@ from django.utils.timezone import now as timezone_now
 from mock import patch, MagicMock
 from zerver.lib.test_helpers import MockLDAP
 
-from confirmation.models import Confirmation, create_confirmation_link
+from confirmation.models import Confirmation, create_confirmation_link, MultiUserInvitation
 
 from zilencer.models import Deployment
 
@@ -749,6 +749,68 @@ class InviteeEmailsParserTests(TestCase):
         expected_set = {self.email1, self.email2, self.email3}
         self.assertEqual(get_invitee_emails_set(emails_raw), expected_set)
 
+class MultiUserInviteTest(ZulipTestCase):
+    def check_able_to_register(self, email, invite_link):
+        # type: (Text, Text) -> None
+        result = self.client_post(invite_link, {'email': email})
+        self.assertEqual(result.status_code, 302)
+        self.assertTrue(result["Location"].endswith(
+            "/accounts/send_confirm/%s" % (email,)))
+        result = self.client_get(result["Location"])
+        self.assert_in_response("Check your email so we can get started.", result)
+
+    def test_multi_user_link_with_no_limit_on_number_of_users(self):
+        # type: () -> None
+        # When there is no limit set, as many number of users
+        # would be able to create new accounts using the invite link.
+        email1 = self.nonreg_email('test')
+        email2 = self.nonreg_email('test1')
+        email3 = self.nonreg_email('alice')
+
+        realm = get_realm('zulip')
+        realm.invite_required = True
+        realm.save()
+        invite = MultiUserInvitation(realm=realm)
+        invite.save()
+        invite_link = create_confirmation_link(invite, realm.host, Confirmation.MULTI_USER_INVITE)
+
+        self.check_able_to_register(email1, invite_link)
+        self.check_able_to_register(email2, invite_link)
+        self.check_able_to_register(email3, invite_link)
+
+    def test_multi_user_link_with_limit_on_number_of_users(self):
+        # type: () -> None
+        # When uses_remaining is set to x, only x number of users
+        # would be able to create new accounts.
+        email1 = self.nonreg_email('test')
+        email2 = self.nonreg_email('test1')
+        email3 = self.nonreg_email('alice')
+
+        realm = get_realm('zulip')
+        realm.invite_required = True
+        realm.save()
+        invite = MultiUserInvitation(realm=realm, uses_remaining=2)
+        invite.save()
+        invite_link = create_confirmation_link(invite, realm.host, Confirmation.MULTI_USER_INVITE)
+
+        self.check_able_to_register(email1, invite_link)
+        self.check_able_to_register(email2, invite_link)
+
+        result = self.client_post(invite_link, {'email': email3})
+        self.assertEqual(result.status_code, 200)
+        self.assert_in_response("Whoops. The confirmation link has expired.", result)
+
+    def test_multi_user_link_with_invalid_key(self):
+        # type: () -> None
+        email = self.nonreg_email('test')
+        realm = get_realm('zulip')
+        realm.invite_required = True
+        realm.save()
+
+        invite_link = "/invite_users/inavlid_key/"
+        result = self.client_post(invite_link, {'email': email})
+        self.assertEqual(result.status_code, 200)
+        self.assert_in_response("Whoops. The confirmation link is malformed.", result)
 
 class EmailUnsubscribeTests(ZulipTestCase):
     def test_error_unsubscribe(self):

@@ -33,8 +33,9 @@ from zerver.lib.utils import get_subdomain
 from zerver.lib.timezone import get_all_timezones
 from zproject.backends import password_auth_enabled
 
-from confirmation.models import Confirmation, RealmCreationKey, check_key_is_valid, \
-    create_confirmation_link
+from confirmation.models import Confirmation, RealmCreationKey, ConfirmationKeyException, \
+    check_key_is_valid, create_confirmation_link, get_object_from_key, \
+    render_confirmation_key_error
 
 import logging
 import requests
@@ -305,6 +306,26 @@ def accounts_home_with_realm_str(request, realm_str):
     else:
         return HttpResponseRedirect(reverse('zerver.views.registration.accounts_home'))
 
+def accounts_home_with_invite_key(request, confirmation_key):
+    # type: (HttpRequest, str) -> HttpResponse
+        try:
+            obj = get_object_from_key(confirmation_key)
+        except ConfirmationKeyException as exception:
+            return render_confirmation_key_error(request, exception)
+        uses_remaining = obj.uses_remaining
+
+        if uses_remaining == 0:
+            return render(request, "confirmation/link_expired.html")
+
+        if uses_remaining is not None:
+            request.session["multi_user_invite_key"] = confirmation_key
+        else:
+            request.session["multi_user_invite_key"] = None
+
+        request.session["realm_str"] = obj.realm.string_id
+        request.session["invited"] = True
+        return accounts_home(request)
+
 def send_registration_completion_email(email, request, realm_creation=False):
     # type: (str, HttpRequest, bool) -> None
     """
@@ -373,11 +394,21 @@ def get_realm_from_request(request):
 def accounts_home(request):
     # type: (HttpRequest) -> HttpResponse
     realm = get_realm_from_request(request)
+    invited = request.session.get("invited", False)
+    multi_user_invite_key = request.session.get("multi_user_invite_key", None)
     if request.method == 'POST':
-        form = HomepageForm(request.POST, realm=realm)
+        form = HomepageForm(request.POST, realm=realm, invited=invited)
         if form.is_valid():
             email = form.cleaned_data['email']
             send_registration_completion_email(email, request)
+
+            # multi_user_invite_key would not be None only in the case of multi
+            # user invite link with limited uses.
+            if multi_user_invite_key is not None:
+                invite_obj = Confirmation.objects.get(confirmation_key=multi_user_invite_key).content_object
+                invite_obj.uses_remaining = invite_obj.uses_remaining - 1
+                invite_obj.save()
+
             return HttpResponseRedirect(reverse('send_confirm', kwargs={'email': email}))
         try:
             email = request.POST['email']
@@ -389,7 +420,7 @@ def accounts_home(request):
         form = HomepageForm(realm=realm)
     return render(request,
                   'zerver/accounts_home.html',
-                  context={'form': form, 'current_url': request.get_full_path},
+                  context={'form': form, 'current_url': request.get_full_path, 'invited': invited},
                   )
 
 def generate_204(request):

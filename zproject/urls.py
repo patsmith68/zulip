@@ -136,6 +136,9 @@ i18n_urls = [
     url(r'^register/(?P<realm_str>\S+)/$', zerver.views.registration.accounts_home_with_realm_str,
         name='zerver.views.registration.accounts_home_with_realm_str'),
 
+    url(r'^invite_users/(?P<confirmation_key>\S+)/$', zerver.views.registration.accounts_home_with_invite_key,
+        name='zerver.views.registration.accounts_home_with_invite_key'),
+
     # API and integrations documentation
     url(r'^api/$', APIView.as_view(template_name='zerver/api.html')),
     url(r'^api/endpoints/$', zerver.views.integrations.api_endpoint_docs, name='zerver.views.integrations.api_endpoint_docs'),
