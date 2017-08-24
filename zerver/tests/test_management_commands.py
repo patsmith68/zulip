@@ -6,6 +6,7 @@ import glob
 from datetime import timedelta
 from mock import MagicMock, patch
 from six.moves import map, filter
+from typing import List
 
 from django.conf import settings
 from django.core.management import call_command
@@ -13,13 +14,17 @@ from django.test import TestCase
 from zerver.lib.management import ZulipBaseCommand, CommandError
 from zerver.lib.test_classes import ZulipTestCase
 from zerver.lib.test_helpers import stdout_suppressed
-from zerver.models import get_realm
+from zerver.models import get_realm, UserProfile
 from confirmation.models import RealmCreationKey, generate_realm_creation_url
 
 class TestZulipBaseCommand(ZulipTestCase):
     def setUp(self):
         # type: () -> None
         self.zulip_realm = get_realm("zulip")
+
+    def sort_users_using_email(self, user_profiles):
+        # type: (List[UserProfile]) -> List[UserProfile]
+        return sorted(user_profiles, key = lambda x: x.email)
 
     def test_get_realm(self):
         # type: () -> None
@@ -50,19 +55,17 @@ class TestZulipBaseCommand(ZulipTestCase):
     def test_get_users(self):
         # type: () -> None
         command = ZulipBaseCommand()
-        user_emails = self.example_email("iago") + "," + self.example_email("hamlet")
-        expected_user_profiles = sorted([self.example_user("iago"), self.example_user("hamlet")],
-                                        key = lambda x: x.email)
+        user_emails = self.example_email("hamlet") + "," + self.example_email("iago")
+        expected_user_profiles = [self.example_user("hamlet"), self.example_user("iago")]
 
-        self.assertEqual(sorted(command.get_users(dict(users=user_emails), self.zulip_realm), key = lambda x: x.email),
+        self.assertEqual(self.sort_users_using_email(command.get_users(dict(users=user_emails), self.zulip_realm)),
                          expected_user_profiles)
-        self.assertEqual(sorted(command.get_users(dict(users=user_emails), None), key = lambda x: x.email),
+        self.assertEqual(self.sort_users_using_email(command.get_users(dict(users=user_emails), None)),
                          expected_user_profiles)
 
         user_emails2 = self.example_email("iago") + "," + self.mit_email("sipbtest")
-        expected_user_profiles2 = sorted([self.example_user("iago"), self.mit_user("sipbtest")],
-                                         key = lambda x: x.email)
-        self.assertEqual(sorted(command.get_users(dict(users=user_emails2), None), key = lambda x: x.email),
+        expected_user_profiles2 = [self.example_user("iago"), self.mit_user("sipbtest")]
+        self.assertEqual(self.sort_users_using_email(command.get_users(dict(users=user_emails2), None)),
                          expected_user_profiles2)
         with self.assertRaisesRegex(CommandError, "The realm '<Realm: zulip 1>' does not contain a user with email"):
             command.get_users(dict(users=user_emails2), self.zulip_realm)
@@ -70,6 +73,25 @@ class TestZulipBaseCommand(ZulipTestCase):
         self.assertEqual(command.get_users(dict(users=self.example_email("iago")), self.zulip_realm),
                          [self.example_user("iago")])
         self.assertEqual(command.get_users(dict(users=None), None), [])
+
+    def test_get_users_with_all_users_argument_enabled(self):
+        # type: () -> None
+        command = ZulipBaseCommand()
+        user_emails = self.example_email("hamlet") + "," + self.example_email("iago")
+        expected_user_profiles = [self.example_user("hamlet"), self.example_user("iago")]
+
+        self.assertEqual(self.sort_users_using_email(command.get_users(dict(users=user_emails, all_users=False), self.zulip_realm)),
+                         expected_user_profiles)
+
+        expected_user_profiles2 = self.sort_users_using_email(UserProfile.objects.filter(realm=self.zulip_realm))
+        self.assertEqual(self.sort_users_using_email(command.get_users(dict(users=None, all_users=True), self.zulip_realm)),
+                         expected_user_profiles2)
+
+        with self.assertRaisesRegex(CommandError, "Please pass either --users or --all-users."):
+            command.get_users(dict(users=user_emails, all_users=True), None)
+
+        with self.assertRaisesRegex(CommandError, "Please specify the realm."):
+            command.get_users(dict(users=None, all_users=True), None)
 
 class TestCommandsCanStart(TestCase):
 

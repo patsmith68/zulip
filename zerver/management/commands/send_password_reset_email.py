@@ -21,7 +21,8 @@ class Command(ZulipBaseCommand):
         parser.add_argument('--entire-server', action="store_true", default=False,
                             help="Send to every user on the server. ")
         self.add_user_list_args(parser,
-                                help="Email addresses of user(s) to send password reset emails to.")
+                                help="Email addresses of user(s) to send password reset emails to.",
+                                all_users_arg=False)
         self.add_realm_args(parser)
 
     def handle(self, *args, **options):
