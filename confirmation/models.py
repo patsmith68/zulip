@@ -113,7 +113,7 @@ class ConfirmationType(object):
 
 _properties = {
     Confirmation.USER_REGISTRATION: ConfirmationType('confirmation.views.confirm'),
-    Confirmation.INVITATION: ConfirmationType('confirmation.views.confirm',
+    Confirmation.INVITATION: ConfirmationType('register',
                                               validity_in_days=settings.INVITATION_LINK_VALIDITY_DAYS),
     Confirmation.EMAIL_CHANGE: ConfirmationType('zerver.views.user_settings.confirm_email_change'),
     Confirmation.UNSUBSCRIBE: ConfirmationType('zerver.views.unsubscribe.email_unsubscribe',

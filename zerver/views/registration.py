@@ -343,21 +343,55 @@ def redirect_to_deactivation_notice():
     # type: () -> HttpResponse
     return HttpResponseRedirect(reverse('zerver.views.registration.show_deactivation_notice'))
 
+
+def accounts_home_from_multiuse_invite(request, confirmation_key):
+    # type: (HttpRequest, str) -> HttpResponse
+    multiuse_object = None
+    try:
+        multiuse_object = get_object_from_key(confirmation_key)
+        # Required for oAuth2
+        request.session["object_key"] = confirmation_key
+    except ConfirmationKeyException as exception:
+        realm = get_realm_from_request(request)
+        if realm is None or realm.invite_required:
+            return render_confirmation_key_error(request, exception)
+    return accounts_home(request, multiuse_object=multiuse_object)
+
+
+def accounts_home(request, confirmation_key=None, obj=None):
     # type: (HttpRequest, Optional[MultiuseInvite]) -> HttpResponse
     realm = get_realm(get_subdomain(request))
     if realm and realm.deactivated:
         return redirect_to_deactivation_notice()
 
+    from_invite = False
     streams_to_subscribe = None
 
+    if confirmation_key is not None:
+        try:
+            obj = get_object_from_key(confirmation_key)
+        except ConfirmationKeyException as exception:
+            realm = get_realm_from_request(request)
+            if realm is None or realm.invite_required:
+                return render_confirmation_key_error(request, exception)
+
+    if obj is not None:
+        realm = obj.realm
+        streams_to_subscribe = obj.streams.all()
+        from_invite = True
+        request.session["object_key"] = confirmation_key
 
     if request.method == 'POST':
+        form = HomepageForm(request.POST, realm=realm, from_invite=from_invite)
         if form.is_valid():
             if hasattr(obj, "status"):
                 obj.status = getattr(settings, "STATUS_ACTIVE", 1)
                 obj.save()
             email = form.cleaned_data['email']
             try:
+                if hasattr(obj, "email") and obj.email == email:
+                    return render(request, 'confirmation/confirm_preregistrationuser.html',
+                                  context={'key': confirmation_key,})
 
                 send_registration_completion_email(email, request, streams=streams_to_subscribe)
             except smtplib.SMTPException as e:
@@ -376,7 +410,7 @@ def redirect_to_deactivation_notice():
     return render(request,
                   'zerver/accounts_home.html',
                   context={'form': form, 'current_url': request.get_full_path,
-                           'from_multiuse_invite': from_multiuse_invite},
+                           'from_invite': from_invite},
                   )
 
 def accounts_home_from_multiuse_invite(request, confirmation_key):
@@ -385,7 +419,7 @@ def accounts_home_from_multiuse_invite(request, confirmation_key):
     try:
         multiuse_object = get_object_from_key(confirmation_key)
         # Required for oAuth2
-        request.session["multiuse_object_key"] = confirmation_key
+        request.session["object_key"] = confirmation_key
     except ConfirmationKeyException as exception:
         realm = get_realm_from_request(request)
         if realm is None or realm.invite_required:

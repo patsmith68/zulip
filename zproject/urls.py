@@ -137,6 +137,7 @@ i18n_urls = [
 
     # Login/registration
     url(r'^register/$', zerver.views.registration.accounts_home, name='register'),
+    url(r'^register/(?P<confirmation_key>[\w]+)$', zerver.views.registration.accounts_home, name='register'),
     url(r'^login/$', zerver.views.auth.login_page, {'template_name': 'zerver/login.html'}, name='zerver.views.auth.login_page'),
 
     url(r'^join/(?P<confirmation_key>\S+)/$', zerver.views.registration.accounts_home_from_multiuse_invite,
