@@ -1280,6 +1280,11 @@ class UserSignUpTest(ZulipTestCase):
         user_profile = self.nonreg_user('newguy')
         self.assertEqual(user_profile.default_language, realm.default_language)
         self.assertEqual(user_profile.timezone, timezone)
+
+        # Try signing up again with the same confirmation link
+        result = self.client_get(confirmation_url)
+        self.assert_in_response("Whoops. The confirmation link has expired.", result)
+
         from django.core.mail import outbox
         outbox.pop()
 

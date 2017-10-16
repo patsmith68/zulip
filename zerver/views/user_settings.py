@@ -38,6 +38,9 @@ def confirm_email_change(request, confirmation_key):
     confirmation_key = confirmation_key.lower()
     try:
         obj = get_object_from_key(confirmation_key)
+        obj.status = getattr(settings, "STATUS_ACTIVE", 1)
+        obj.save()
+
     except ConfirmationKeyException as exception:
         return render_confirmation_key_error(request, exception)
 

@@ -66,8 +66,8 @@ def get_object_from_key(confirmation_key):
 
     obj = confirmation.content_object
     if hasattr(obj, "status"):
-        obj.status = getattr(settings, 'STATUS_ACTIVE', 1)
-        obj.save(update_fields=['status'])
+        if obj.status == getattr(settings, 'STATUS_ACTIVE', 1):
+            raise ConfirmationKeyException(ConfirmationKeyException.EXPIRED)
     return obj
 
 def create_confirmation_link(obj, host, confirmation_type, url_args=None):

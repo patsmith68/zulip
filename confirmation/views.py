@@ -21,7 +21,9 @@ from typing import Any, Dict
 def confirm(request, confirmation_key):
     # type: (HttpRequest, str) -> HttpResponse
     try:
-        get_object_from_key(confirmation_key)
+        obj = get_object_from_key(confirmation_key)
+        obj.status = getattr(settings, "STATUS_ACTIVE", 1)
+        obj.save()
     except ConfirmationKeyException as exception:
         return render_confirmation_key_error(request, exception)
 

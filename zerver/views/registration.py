@@ -343,25 +343,22 @@ def redirect_to_deactivation_notice():
     # type: () -> HttpResponse
     return HttpResponseRedirect(reverse('zerver.views.registration.show_deactivation_notice'))
 
-def accounts_home(request, multiuse_object=None):
     # type: (HttpRequest, Optional[MultiuseInvite]) -> HttpResponse
     realm = get_realm(get_subdomain(request))
     if realm and realm.deactivated:
         return redirect_to_deactivation_notice()
 
-    from_multiuse_invite = False
     streams_to_subscribe = None
 
-    if multiuse_object:
-        realm = multiuse_object.realm
-        streams_to_subscribe = multiuse_object.streams.all()
-        from_multiuse_invite = True
 
     if request.method == 'POST':
-        form = HomepageForm(request.POST, realm=realm, from_multiuse_invite=from_multiuse_invite)
         if form.is_valid():
+            if hasattr(obj, "status"):
+                obj.status = getattr(settings, "STATUS_ACTIVE", 1)
+                obj.save()
             email = form.cleaned_data['email']
             try:
+
                 send_registration_completion_email(email, request, streams=streams_to_subscribe)
             except smtplib.SMTPException as e:
                 logging.error('Error in accounts_home: %s' % (str(e),))

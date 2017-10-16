@@ -82,6 +82,9 @@ def maybe_send_to_registration(request, email, full_name='', password_required=T
             if streams_to_subscribe is not None:
                 prereg_user.streams = streams_to_subscribe
             prereg_user.save()
+            if hasattr(multiuse_obj, "status"):
+                multiuse_obj.status = getattr(settings, "STATUS_ACTIVE", 1)
+                multiuse_obj.save()
 
         return redirect("".join((
             create_confirmation_link(prereg_user, request.get_host(), Confirmation.USER_REGISTRATION),
