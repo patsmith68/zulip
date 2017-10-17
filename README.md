@@ -78,6 +78,9 @@ additional platforms. The installation process is
 
 ## Ways to contribute
 
+![great for new contributors](great-for-new-contributors.png
+)
+
 Zulip welcomes all forms of contributions!  This page documents the
 Zulip development process.
 
