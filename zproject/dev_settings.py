@@ -10,6 +10,10 @@ EMAIL_LOG_DIR = "/var/log/zulip/email.log"
 # Check if test_settings.py set EXTERNAL_HOST.
 EXTERNAL_HOST = os.getenv('EXTERNAL_HOST')
 if EXTERNAL_HOST is None:
+    user_id = os.getuid()
+    user_name = pwd.getpwuid(user_id).pw_name
+    if user_name == "zulipdev":
+        EXTERNAL_HOST = os.uname()[1] + ":9991"
     EXTERNAL_HOST = 'zulipdev.com:9991'
 ALLOWED_HOSTS = ['*']
 
