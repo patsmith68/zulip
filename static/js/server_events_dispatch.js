@@ -366,6 +366,16 @@ exports.dispatch_normal_event = function dispatch_normal_event(event) {
         ui.remove_message(msg_id);
         break;
 
+    case 'attachments':
+        if (event.op === 'add') {
+            page_params.attachments.push(event.attachment);
+        } else if (event.op === 'remove') {
+            page_params.attachments = page_params.attachments.filter(function (a) {
+                return a.path_id !== event.attachment.path_id;
+            });
+        }
+        break;
+
     }
 };
 

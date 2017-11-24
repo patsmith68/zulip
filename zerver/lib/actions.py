@@ -108,6 +108,7 @@ from zerver.lib.sessions import delete_user_sessions
 from zerver.lib.upload import attachment_url_re, attachment_url_to_path_id, \
     claim_attachment, delete_message_image
 from zerver.lib.str_utils import NonBinaryStr, force_str
+from zerver.lib.attachments import access_attachment_by_path_id
 from zerver.tornado.event_queue import request_event_queue, send_event
 
 import DNS
@@ -3644,6 +3645,14 @@ def do_delete_message(user_profile, message):
     move_message_to_archive(message.id)
     send_event(event, ums)
 
+def notify_attachment_update(user_profile: UserProfile, op: str,
+                             attachment: Dict[str, Any]) -> None:
+    event = {
+        'type': 'attachments',
+        'op': op,
+        'attachment': attachment}
+    send_event(event, [user_profile.id])
+
 
 def encode_email_address(stream):
     # type: (Stream) -> Text
@@ -4294,6 +4303,8 @@ def do_claim_attachments(message):
             continue
 
         claim_attachment(user_profile, path_id, message, is_message_realm_public)
+        attachment = access_attachment_by_path_id(user_profile, path_id)
+        notify_attachment_update(user_profile, "add", attachment)
 
 def do_delete_old_unclaimed_attachments(weeks_ago):
     # type: (int) -> None

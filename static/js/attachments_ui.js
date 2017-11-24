@@ -2,7 +2,7 @@ var attachments_ui = (function () {
 
 var exports = {};
 
-function delete_attachments(attachment) {
+function delete_attachments(attachment, row) {
     var status = $('#delete-upload-status');
     channel.del({
         url: '/json/attachments/' + attachment,
@@ -11,6 +11,7 @@ function delete_attachments(attachment) {
             ui_report.error(i18n.t("Failed"), xhr, status);
         },
         success: function () {
+            row.remove();
             ui_report.success(i18n.t("Attachment deleted"), status);
         },
     });
@@ -23,7 +24,7 @@ exports.bytes_to_size = function (bytes) {
     }
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
- };
+};
 
 exports.set_up_attachments = function () {
     // The settings page must be rendered before this function gets called.
@@ -82,8 +83,7 @@ exports.set_up_attachments = function () {
 
     $('#uploaded_files_table').on('click', '.remove-attachment', function (e) {
         var row = $(e.target).closest(".uploaded_file_row");
-        row.remove();
-        delete_attachments($(this).data('attachment'));
+        delete_attachments($(this).data('attachment'), row);
     });
 };
 
