@@ -40,11 +40,9 @@ RUN apt-get update \
     netcat unzip zip jq \
     python3-pip \
   && ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime \
-  && { locale-gen en_US.UTF-8 || true; } \
-  && echo "LC_ALL=en_US.UTF-8" | sudo tee -a /etc/default/locale
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+  && { locale-gen C.UTF-8 || true; } \
+  && echo "LC_ALL=C.UTF-8" | sudo tee -a /etc/default/locale
+ENV LC_ALL C.UTF-8
 
 # Install Docker.  This logic comes from Circle's Dockerfile; it's probably
 # faster than the upstream-recommended approach of using their apt repo,
