@@ -40,8 +40,7 @@ RUN apt-get update \
     netcat unzip zip jq \
     python3-pip \
   && ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime \
-  && { locale-gen en_US.UTF-8 || true; } \
-  && echo "LC_ALL=en_US.UTF-8" | sudo tee -a /etc/default/locale
+  && { locale-gen en_US.UTF-8 || true; }
 ENV LC_ALL en_US.UTF-8
 
 # Install Docker.  This logic comes from Circle's Dockerfile; it's probably
