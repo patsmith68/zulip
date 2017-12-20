@@ -6,7 +6,7 @@ jobs:
   build:
     docker:
       # This is built from tools/circleci/images/Dockerfile .
-      - image: hackerkid/circleci:trusty-python-3.test
+      - image: hackerkid/circleci:trusty-python-22.test
 
     working_directory: ~/repo
 
