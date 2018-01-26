@@ -27,7 +27,7 @@
 #   3. update .circleci/config.yml to refer to the new name
 
 # TODO add xenial
-FROM buildpack-deps:trusty-scm
+FROM buildpack-deps:xenial-scm
 
 RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
   && echo 'DPkg::Options "--force-confnew";' >> /etc/apt/apt.conf.d/90circleci
@@ -35,12 +35,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
   && apt-get install -y \
+    sudo \
+    locales \
     xvfb \
     parallel \
     netcat unzip zip jq \
     python3-pip \
   && ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime \
-  && { locale-gen en_US.UTF-8 || true; } \
+  && (locale-gen en_US.UTF-8 || true) \
   && echo "LC_ALL=en_US.UTF-8" | sudo tee -a /etc/default/locale
 
 # Set the locale, together with the locale-related steps above.
@@ -91,8 +93,8 @@ RUN apt-get update \
     hunspell-en-us supervisor libssl-dev yui-compressor puppet \
     gettext libffi-dev libfreetype6-dev libz-dev libjpeg-dev \
     libldap2-dev libmemcached-dev python-dev python-pip \
-    python-virtualenv python-six libxml2-dev libxslt1-dev libpq-dev \
-    postgresql-9.3
+    python-six libxml2-dev libxslt1-dev libpq-dev \
+    virtualenv postgresql-9.6
 
 RUN groupadd --gid 3434 circleci \
   && useradd --uid 3434 --gid circleci --shell /bin/bash --create-home circleci \
