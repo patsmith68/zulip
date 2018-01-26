@@ -68,8 +68,7 @@ addons:
   apt:
     packages:
       - moreutils
-after_success:
-  - codecov
+
 notifications:
   webhooks:
     urls:
