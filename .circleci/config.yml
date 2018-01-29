@@ -76,10 +76,6 @@ jobs:
             . /srv/zulip-py3-venv/bin/activate
             mispipe ./tools/travis/frontend ts
 
-      -  run:
-          name: run codecov
-          command: codecov
-
       # - store_artifacts:  # TODO
       #     path: var/casper/
       #     # also /tmp/zulip-test-event-log/
