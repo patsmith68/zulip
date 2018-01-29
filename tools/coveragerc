@@ -25,4 +25,3 @@ omit =
     zerver/tornado/ioloop_logging.py
     # Zulip's library for use in scripts
     scripts/lib/zulip_tools.py
-source = zulip

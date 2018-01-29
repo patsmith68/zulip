@@ -35,7 +35,7 @@ jobs:
             sudo apt-get install -y moreutils
 
             # With a retry to minimize impact of transient networking errors.
-            mispipe "sudo pip install codecov" ts || mispipe "sudo pip install codecov" ts
+            mispipe "pip install --user codecov" ts || mispipe "pip install --user codecov" ts
 
             # CircleCI sets the following in Git config at clone time:
             #   url.ssh://git@github.com.insteadOf https://github.com
