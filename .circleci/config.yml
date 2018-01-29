@@ -78,7 +78,7 @@ jobs:
 
       -  run:
           name: run codecov
-          command: codecov
+          command: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 
       # - store_artifacts:  # TODO
       #     path: var/casper/
