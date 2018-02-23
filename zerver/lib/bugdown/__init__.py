@@ -822,10 +822,12 @@ class InlineInterestingLinkProcessor(markdown.treeprocessors.Treeprocessor):
             if uncle_link not in parent_links:
                 return insertion_index
 
+    def is_absolute_url(self, url: Text):
+        return bool(urllib.parse.urlparse(url).netloc)
+
     def run(self, root: Element) -> None:
         # Get all URLs from the blob
         found_urls = walk_tree_with_family(root, self.get_url_data)
-
         if len(found_urls) == 0 or len(found_urls) > self.INLINE_PREVIEW_LIMIT_PER_MESSAGE:
             return
 
@@ -833,8 +835,24 @@ class InlineInterestingLinkProcessor(markdown.treeprocessors.Treeprocessor):
 
         for found_url in found_urls:
             (url, text) = found_url.result
-            dropbox_image = self.dropbox_image(url)
+            if not self.is_absolute_url(url):
+                if self.is_image(url):
+                    self.handle_image_inlining(root, found_url)
+                url_preview_enabled = url_embed_preview_enabled_for_realm(current_message)
 
+                if current_message is None or not url_preview_enabled:
+                    continue
+                realm_uri = current_message.get_realm().uri
+                absolute_url = urllib.parse.urljoin(realm_uri, url)
+                try:
+                    extracted_data = link_preview.link_embed_data_from_cache(absolute_url)
+                    if extracted_data:
+                        add_embed(root, absolute_url, extracted_data)
+                except NotFoundInCache:
+                    current_message.links_for_preview.add(absolute_url)
+                continue
+
+            dropbox_image = self.dropbox_image(url)
             if dropbox_image is not None:
                 class_attr = "message_inline_ref"
                 is_image = dropbox_image["is_image"]
