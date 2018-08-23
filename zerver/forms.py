@@ -349,3 +349,8 @@ class FindMyTeamForm(forms.Form):
             raise forms.ValidationError(_("Please enter at most 10 emails."))
 
         return emails
+
+class ContactForm(forms.Form):
+    full_name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    content = forms.CharField(widget=forms.Textarea)
