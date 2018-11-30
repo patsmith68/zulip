@@ -115,7 +115,9 @@ def delete_fixture_data(decorated_function: CallableT) -> None:  # nocoverage
 def normalize_fixture_data(decorated_function: CallableT) -> None:  # nocoverage
     # stripe ids are all of the form cus_D7OT2jf5YAtZQ2
     id_lengths = [
-        ('cus', 14), ('sub', 14), ('si', 14), ('sli', 14), ('req', 14), ('tok', 24), ('card', 24)]
+        ('cus', 14), ('sub', 14), ('si', 14), ('sli', 14), ('req', 14), ('tok', 24), ('card', 24),
+        ('txn', 24), ('ch', 24), ('in', 24), ('ii', 24), ('test', 12), ('src_client_secret', 24),
+        ('src', 24)]
     # We'll replace cus_D7OT2jf5YAtZQ2 with something like cus_NORMALIZED0001
     pattern_translations = {
         "%s_[A-Za-z0-9]{%d}" % (prefix, length): "%s_NORMALIZED%%0%dd" % (prefix, length - 10)
@@ -126,6 +128,9 @@ def normalize_fixture_data(decorated_function: CallableT) -> None:  # nocoverage
         '"invoice_prefix": "[A-Za-z0-9]{7}"': '"invoice_prefix": "NORMA%02d"',
         '"fingerprint": "[A-Za-z0-9]{16}"': '"fingerprint": "NORMALIZED%06d"',
         '"number": "[A-Za-z0-9]{7}-[A-Za-z0-9]{4}"': '"number": "NORMALI-%04d"',
+        '"swift_code": "[A-Za-z0-9]{8}"': '"swift_code": "NORMA%03d"',
+        '"routing_number": "[A-Za-z0-9]{9}"': '"routing_number": "NORMALI%02d"',
+        '"address": "[A-Za-z0-9]{9}-test_[A-Za-z0-9]{12}"': '"address": "000000000-test_NORMALIZED%02d"',
     })
 
     normalized_values = {pattern: {}
@@ -638,6 +643,8 @@ class StripeTest(ZulipTestCase):
         user = self.example_user('hamlet')
         attach_discount_to_realm(user, 85)
         self.login(user.email)
+        # Check that the discount appears in page_params
+        self.assert_in_success_response(['85'], self.client_get("/upgrade/"))
         self.upgrade()
         stripe_customer = stripe_get_customer(Customer.objects.get(realm=user.realm).stripe_customer_id)
         assert(stripe_customer.discount is not None)  # for mypy
