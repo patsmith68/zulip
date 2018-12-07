@@ -20,7 +20,7 @@ class TestFeedbackBot(ZulipTestCase):
 class TestContactForm(ZulipTestCase):
     # Test to make sure that a maximum of only 100 submissions are made through
     # contact form a in day.
-    def test_contact_form(self):
+    def test_contact_form(self) -> None:
         client = get_redis_client()
         date1 = datetime(2017, 11, 22)
         day1 = date1.day
@@ -49,7 +49,7 @@ class TestContactForm(ZulipTestCase):
                     "full_name": user.full_name,
                     "content": "I love Zulip threading!"
                 })
-                self.assert_in_success_response(["Thanks for reaching out to us"], response)
+                self.assert_in_success_response(["Thanks for reaching out!"], response)
             self.assertEqual(int(client.get(day1)), 11)
             self.assertEqual(len(mail.outbox), 11)
             self.assertEqual(mail.outbox[10].subject, "Zulip support request from {}".format(user.email))
@@ -75,7 +75,7 @@ class TestContactForm(ZulipTestCase):
                 "content": "I love markdown support!"
             })
 
-            self.assert_in_success_response(["Thanks for reaching out to us"], response)
+            self.assert_in_success_response(["Thanks for reaching out!"], response)
             self.assertEqual(int(client.get(day2)), 1)
             self.assertEqual(len(mail.outbox), 12)
             self.assertEqual(mail.outbox[11].subject, "Zulip support request from {}".format(user.email))
