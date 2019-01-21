@@ -24,7 +24,7 @@ piexif==1.0.13            # via thumbor
 pillow==4.3.0             # via thumbor
 pyasn1-modules==0.2.2     # via python-ldap
 pyasn1==0.4.3             # via pyasn1-modules, python-ldap
-pycryptodome==3.6.1       # via thumbor
+pycryptodome==3.7.3       # via thumbor
 pycurl==7.43.0.2          # via thumbor, tornado-botocore
 python-dateutil==2.7.3    # via botocore, tc-aws
 python-ldap==3.1.0        # via django-auth-ldap
