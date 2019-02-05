@@ -11,58 +11,32 @@
 {% endblock %}
 
 {% block content %}
-    Hello {{ name }},
-
-    <p>
-        While you were away you received {{ message_count }} new{% if group_pm %} group private{% elif private_message %} private{% endif %} message{{ message_count|pluralize }}{% if mention %} in which you were mentioned{% endif %}!
-    </p>
-
     {% if show_message_content %}
-    <div class='messages'>
         {% for recipient_block in messages %}
-        {% if recipient_block.header.stream_message %}
-        <div class='recipient_block_with_messages'>
-            <div class='recipient_header_with_messages'>{{ recipient_block.header.html|safe }}</div>
-            <div class='message_content_with_messages'>
-        {% else %}
-        <div class='recipient_block_without_messages'>
-            <div class='recipient_header_without_messages'>{{ recipient_block.header.html|safe }}</div>
-            <div class='message_content_without_messages'>
-        {% endif %}
-                {% for sender_block in recipient_block.senders %}
-                    {% if sender_block.sender %} <div class="message_sender">{{ sender_block.sender }}</div>{% endif %}
+            {% for sender_block in recipient_block.senders %}
+                <div class="missed_message">
+                    {% if sender_block.sender %}<div class="missed_message_sender">{{ sender_block.sender }}</div>{% endif %}
                     {% for message_block in sender_block.content %}
-                    <div class='message_content_block'>
                         {{ message_block.html|safe }}
-                    </div>
                     {% endfor %}
-                {% endfor %}
-            </div>
-        </div>
+                </div>
+            {% endfor %}
         {% endfor %}
-    </div>
     {% endif %}
-
-
-    <p>
-        {% if reply_to_zulip %}
-        Reply to this email directly, or <a href="{{ realm_uri }}">view it in Zulip</a>.
-        {% else %}
-        <a href="{{ realm_uri }}">Reply in Zulip</a>.
-        {% endif %}
-    </p>
-
-    {% if reply_warning %}
-    <p>Please do not reply to this automated message. To respond to the missed messages you have received, please log on to Zulip and send your replies there.</p>
-    {% endif %}
-
-    <p>
-        Cheers,
-        <br />
-        The Zulip Team
-    </p>
 {% endblock %}
 
 {% block manage_preferences %}
-<p><a href="{{ realm_uri }}/#settings/notifications">Manage email preferences</a> | <a href="{{ unsubscribe_link }}">Unsubscribe</a> from missed message emails</p>
+
+<div class="email-preferences">
+    &mdash;<br>
+    <a href="{{ realm_uri }}/#settings/notifications">Manage email preferences</a> | <a href="{{ unsubscribe_link }}">Unsubscribe</a> from missed message emails.<br>
+    {% if reply_to_zulip %}
+        Reply to this email directly, or <a href="{{ realm_uri }}">view it in Zulip</a>.<br>
+    {% else %}
+        <a href="{{ realm_uri }}">Reply in Zulip</a>.<br>
+    {% endif %}
+    {% if reply_warning %}
+        Please do not reply to this automated message. To respond to the missed messages you have received, please log on to Zulip and send your replies there.
+    {% endif %}
+</div>
 {% endblock %}

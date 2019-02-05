@@ -1,7 +1,3 @@
-Hello {{ name }},
-
-While you were away you received {{ message_count }} new{% if group_pm %} group private{% elif private_message %} private{% endif %} message{{ message_count|pluralize }}{% if mention %} in which you were mentioned{% endif %}!
-
 {% if show_message_content %}
 {% for recipient_block in messages %}
     {{ recipient_block.header.plain }}
@@ -12,6 +8,12 @@ While you were away you received {{ message_count }} new{% if group_pm %} group 
     {% endfor %}
 {% endfor %}
 {% endif %}
+
+Manage email preferences:
+{{ realm_uri }}/#settings/notifications
+
+Unsubscribe from missed message emails:
+{{ unsubscribe_link }}
 
 {% if reply_to_zulip  %}
 Reply to this email directly, or view it in Zulip:
@@ -24,14 +26,3 @@ Reply in Zulip:
 {% if reply_warning %}
 Please do not reply to this automated message. To respond to the missed messages you have received, please log on to Zulip and send your replies there.
 {% endif %}
-
-Cheers,
-The Zulip Team
-
-Manage email preferences:
-
-{{ realm_uri }}/#settings/notifications
-
-Unsubscribe from missed message emails:
-
-{{ unsubscribe_link }}

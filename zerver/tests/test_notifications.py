@@ -245,7 +245,7 @@ class TestMissedMessages(ZulipTestCase):
             verify_body_does_not_include = []  # type: List[str]
         else:
             # Test in case if message content in missed email message are disabled.
-            body = 'While you were away you received 1 new message in which you were mentioned!'
+            body = 'Manage email preferences: http://zulip.testserver/#settings/notifications'
             email_subject = 'New missed messages'
             verify_body_does_not_include = ['Denmark > test', 'Othello, the Moor of Venice',
                                             '1 2 3 4 5 6 7 8 9 10 @**King Hamlet**', 'private', 'group',
@@ -306,7 +306,7 @@ class TestMissedMessages(ZulipTestCase):
             email_subject = 'PMs with Othello, the Moor of Venice'
             verify_body_does_not_include = []  # type: List[str]
         else:
-            body = 'While you were away you received 1 new private message!'
+            body = 'Manage email preferences: http://zulip.testserver/#settings/notifications'
             email_subject = 'New missed messages'
             verify_body_does_not_include = ['Othello, the Moor of Venice', 'Extremely personal message!',
                                             'mentioned', 'group', 'Reply to this email directly, or view it in Zulip']
@@ -366,7 +366,7 @@ class TestMissedMessages(ZulipTestCase):
             email_subject = 'Group PMs with Iago and Othello, the Moor of Venice'
             verify_body_does_not_include = []  # type: List[str]
         else:
-            body = 'While you were away you received 1 new group private message!'
+            body = 'Manage email preferences: http://zulip.testserver/#settings/notifications'
             email_subject = 'New missed messages'
             verify_body_does_not_include = ['Iago', 'Othello, the Moor of Venice Othello, the Moor of Venice',
                                             'Group personal message!', 'mentioned',
