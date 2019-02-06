@@ -22,7 +22,3 @@ Reply to this email directly, or view it in Zulip:
 Reply in Zulip:
 {{ realm_uri }}
 {% endif %}
-
-{% if reply_warning %}
-Please do not reply to this automated message. To respond to the missed messages you have received, please log on to Zulip and send your replies there.
-{% endif %}
