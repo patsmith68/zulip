@@ -3,7 +3,7 @@ thumbor==6.5.1
 typing==3.6.6
 # Required for just importing settings from our main django app.
 django-auth-ldap==1.7.0
-Django==1.11.14
+Django==2.1.7
 
 # Below dependencies should ideally have been added to thumbor.txt by the
 # use of tools/update-locked-requirements but for some reason `pip-compile`
