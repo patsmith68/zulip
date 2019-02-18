@@ -9,12 +9,12 @@
 #
 --no-binary psycopg2
 
-git+https://github.com/zulip/django-bitfield@0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38#egg=django-bitfield==1.9.3+dev.0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38
-git+https://github.com/zulip/libthumbor.git@60ed2431c07686a12f2770b2d852c5650f3ccfc6#egg=libthumbor==1.3.2zulip
-git+https://github.com/zulip/talon.git@7d8bdc4dbcfcc5a73298747293b99fe53da55315#egg=talon==1.2.10.zulip1
-git+https://github.com/zulip/ultrajson@70ac02bec#egg=ujson==1.35+git
-git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip==0.5.6_git&subdirectory=zulip
-git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip_bots==0.5.6+git&subdirectory=zulip_bots
+-e git+https://github.com/zulip/django-bitfield@0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38#egg=django-bitfield==1.9.3+dev.0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38
+-e git+https://github.com/zulip/libthumbor.git@60ed2431c07686a12f2770b2d852c5650f3ccfc6#egg=libthumbor==1.3.2zulip
+-e git+https://github.com/zulip/talon.git@7d8bdc4dbcfcc5a73298747293b99fe53da55315#egg=talon==1.2.10.zulip1
+-e git+https://github.com/zulip/ultrajson@70ac02bec#egg=ujson==1.35+git
+-e git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip==0.5.6_git&subdirectory=zulip
+-e git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip_bots==0.5.6+git&subdirectory=zulip_bots
 apns2==0.4.1
 argon2-cffi==18.3.0
 asn1crypto==0.24.0        # via cryptography
@@ -47,6 +47,7 @@ django-two-factor-auth==1.8.0
 django-webpack-loader==0.6.0
 django==1.11.16
 docopt==0.6.2
+future==0.17.1            # via python-twitter
 gitdb==0.6.4
 google-api-python-client==1.7.4
 google-auth-httplib2==0.0.3  # via google-api-python-client
@@ -60,7 +61,7 @@ hyperframe==3.2.0         # via h2, hyper
 idna==2.7                 # via cryptography, requests
 ijson==2.3
 ipython-genutils==0.2.0   # via traitlets
-ipython==6.5.0
+ipython==7.3.0
 jedi==0.13.1              # via ipython
 jinja2==2.10
 lxml==4.2.5
@@ -82,7 +83,7 @@ pika==0.11.0
 pillow==5.3.0
 polib==1.1.0
 premailer==3.2.0
-prompt-toolkit==1.0.15    # via ipython
+prompt-toolkit==2.0.8     # via ipython
 psycopg2==2.7.6.1
 ptyprocess==0.6.0         # via pexpect
 py3dns==3.2.0
@@ -109,7 +110,6 @@ regex==2018.11.7
 requests-oauthlib==1.0.0
 requests[security]==2.20.1  # via matrix-client, premailer, pyoembed, python-gcm, python-twitter, requests-oauthlib, social-auth-core, stripe, twilio
 rsa==4.0
-simplegeneric==0.8.1      # via ipython
 six==1.11.0
 smmap==0.9.0
 social-auth-app-django==3.1.0

@@ -9,12 +9,12 @@
 #
 --no-binary psycopg2
 
-git+https://github.com/zulip/django-bitfield@0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38#egg=django-bitfield==1.9.3+dev.0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38
-git+https://github.com/zulip/libthumbor.git@60ed2431c07686a12f2770b2d852c5650f3ccfc6#egg=libthumbor==1.3.2zulip
-git+https://github.com/zulip/talon.git@7d8bdc4dbcfcc5a73298747293b99fe53da55315#egg=talon==1.2.10.zulip1
-git+https://github.com/zulip/ultrajson@70ac02bec#egg=ujson==1.35+git
-git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip==0.5.6_git&subdirectory=zulip
-git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip_bots==0.5.6+git&subdirectory=zulip_bots
+-e git+https://github.com/zulip/django-bitfield@0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38#egg=django-bitfield==1.9.3+dev.0d2b15cdb5af5ddec88d41cac19c0f2ce1b1ad38
+-e git+https://github.com/zulip/libthumbor.git@60ed2431c07686a12f2770b2d852c5650f3ccfc6#egg=libthumbor==1.3.2zulip
+-e git+https://github.com/zulip/talon.git@7d8bdc4dbcfcc5a73298747293b99fe53da55315#egg=talon==1.2.10.zulip1
+-e git+https://github.com/zulip/ultrajson@70ac02bec#egg=ujson==1.35+git
+-e git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip==0.5.6_git&subdirectory=zulip
+-e git+https://github.com/zulip/python-zulip-api.git@0.5.6#egg=zulip_bots==0.5.6+git&subdirectory=zulip_bots
 alabaster==0.7.12
 apns2==0.4.1
 argon2-cffi==18.3.0
@@ -64,6 +64,7 @@ docopt==0.6.2
 docutils==0.14
 fakeldap==0.6.1
 first==2.0.1              # via pip-tools
+future==0.17.1            # via python-twitter
 gitdb==0.6.4
 gitlint==0.10.0
 google-api-python-client==1.7.4
@@ -82,7 +83,7 @@ ijson==2.3
 imagesize==1.1.0
 incremental==17.5.0       # via twisted
 ipython-genutils==0.2.0   # via traitlets
-ipython==6.5.0
+ipython==7.3.0
 isort==4.3.4
 jedi==0.13.1              # via ipython
 jinja2==2.10
@@ -113,7 +114,7 @@ pillow==5.3.0
 pip-tools==2.0.2
 polib==1.1.0
 premailer==3.2.0
-prompt-toolkit==1.0.15    # via ipython
+prompt-toolkit==2.0.8     # via ipython
 psycopg2==2.7.6.1
 ptyprocess==0.6.0         # via pexpect
 py3dns==3.2.0
@@ -155,7 +156,6 @@ s3transfer==0.1.13        # via boto3
 scrapy==1.5.1
 service-identity==17.0.0  # via scrapy
 sh==1.11                  # via gitlint
-simplegeneric==0.8.1      # via ipython
 six==1.11.0
 smmap==0.9.0
 snakeviz==1.0.0
